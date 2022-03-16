@@ -65,14 +65,7 @@ public class CharacterChange {
         int highestCharacterLevel = player.getCharacterLevel(currentCharacter);
         String highestCharacter = currentCharacter;
         Iterator it = characterLevels.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry)it.next();
-            int value = (int)pairs.getValue();
-            if (value > highestCharacterLevel) {
-                highestCharacterLevel = value;
-                highestCharacter = (String)pairs.getKey();
-            }
-        }
+        highestCharacter = getString(highestCharacterLevel, highestCharacter, it);
         if (!highestCharacter.equals(currentCharacter)) {
             player.setCurrentCharacterType(highestCharacter);
             QueueProvider.offer("You're character type is now changed! You are now a " + highestCharacter + "!");
@@ -82,6 +75,18 @@ public class CharacterChange {
             Map.Entry pairs = (Map.Entry)it.next();
             player.setCharacterLevel((String)pairs.getKey(), (int)pairs.getValue());
         }
+    }
+
+    public String getString(int highestCharacterLevel, String highestCharacter, Iterator it) {
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry)it.next();
+            int value = (int)pairs.getValue();
+            if (value > highestCharacterLevel) {
+                highestCharacterLevel = value;
+                highestCharacter = (String)pairs.getKey();
+            }
+        }
+        return highestCharacter;
     }
 
 }
