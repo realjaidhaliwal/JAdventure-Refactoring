@@ -5,7 +5,6 @@ import com.jadventure.game.entities.Entity;
 import com.jadventure.game.entities.Player;
 import com.jadventure.game.entities.NPC;
 import com.jadventure.game.QueueProvider;
-import com.jadventure.game.CharacterChange;
 import com.jadventure.game.items.ItemStack;
 import com.jadventure.game.items.Item;
 import com.jadventure.game.GameBeans;
@@ -81,8 +80,7 @@ public class BattleMenu extends Menus {
             if (oldLevel < newLevel) {
                 QueueProvider.offer("You've are now level " + newLevel + "!");
             }
-            CharacterChange cc = new CharacterChange();
-            cc.trigger(this.player, "kill", opponent.getName());
+            this.player.trigger("kill", opponent.getName());
         }
     }
 
