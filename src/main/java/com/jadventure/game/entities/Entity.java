@@ -190,25 +190,7 @@ public abstract class Entity {
     public Map<String, String> equipItem(EquipmentLocation place, Item item) {
         double oldDamage = this.damage;
         int oldArmour = this.armour;
-        if (place == null) {
-            place = item.getPosition();
-        }
-        if (equipment.get(place) != null) {
-            unequipItem(equipment.get(place));
-        }
-        if (place == EquipmentLocation.BOTH_HANDS) {
-            unequipTwoPlaces(EquipmentLocation.LEFT_HAND, EquipmentLocation.RIGHT_HAND);
-        } else if (place == EquipmentLocation.BOTH_ARMS) {
-            unequipTwoPlaces(EquipmentLocation.LEFT_ARM, EquipmentLocation.RIGHT_ARM);
-        } 
-        Item bothHands = equipment.get(EquipmentLocation.BOTH_HANDS);
-        if (bothHands != null && (EquipmentLocation.LEFT_HAND == place || EquipmentLocation.RIGHT_HAND == place)) { 
-            unequipItem(bothHands);
-        }
-        Item bothArms = equipment.get(EquipmentLocation.BOTH_ARMS);
-        if (bothArms != null && (place == EquipmentLocation.LEFT_ARM || place == EquipmentLocation.RIGHT_ARM)) { 
-            unequipItem(bothArms);
-        }
+        place = getEquipmentLocation(place, item);
         equipment.put(place, item);
         removeItemFromStorage(item);
         Map<String, String> result = new HashMap<String, String>();
@@ -255,6 +237,29 @@ public abstract class Entity {
             }
         }
         return result;
+    }
+
+    private EquipmentLocation getEquipmentLocation(EquipmentLocation place, Item item) {
+        if (place == null) {
+            place = item.getPosition();
+        }
+        if (equipment.get(place) != null) {
+            unequipItem(equipment.get(place));
+        }
+        if (place == EquipmentLocation.BOTH_HANDS) {
+            unequipTwoPlaces(EquipmentLocation.LEFT_HAND, EquipmentLocation.RIGHT_HAND);
+        } else if (place == EquipmentLocation.BOTH_ARMS) {
+            unequipTwoPlaces(EquipmentLocation.LEFT_ARM, EquipmentLocation.RIGHT_ARM);
+        }
+        Item bothHands = equipment.get(EquipmentLocation.BOTH_HANDS);
+        if (bothHands != null && (EquipmentLocation.LEFT_HAND == place || EquipmentLocation.RIGHT_HAND == place)) { 
+            unequipItem(bothHands);
+        }
+        Item bothArms = equipment.get(EquipmentLocation.BOTH_ARMS);
+        if (bothArms != null && (place == EquipmentLocation.LEFT_ARM || place == EquipmentLocation.RIGHT_ARM)) { 
+            unequipItem(bothArms);
+        }
+        return place;
     }
 
     private void unequipTwoPlaces(EquipmentLocation leftLocation, EquipmentLocation rightLocation) {
