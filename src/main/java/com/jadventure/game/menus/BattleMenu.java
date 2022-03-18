@@ -118,15 +118,15 @@ public class BattleMenu extends Menus {
                    break;
             }
             case "equip": {
-                   equip();
+                   player.promptEquip();
                    break;
             }
             case "unequip": {
-                  unequip();
+                  player.promtUnequip();
                   break;
             }
             case "view": {
-                  viewStats();
+                  player.viewStats();
                   break;
             }
             default: {
@@ -179,47 +179,4 @@ public class BattleMenu extends Menus {
         player.setDamage(damage);
     }
 
-    private void equip() {
-        player.printStorage();
-        QueueProvider.offer("What item do you want to use?");
-        String itemName = QueueProvider.take();
-        if (!itemName.equalsIgnoreCase("back")) {
-            player.equipItem(itemName);
-        }
-    }
-
-    private void unequip() {
-        player.printEquipment();
-        QueueProvider.offer("What item do you want to unequip?");
-        String itemName = QueueProvider.take();
-        if (!itemName.equalsIgnoreCase("back")) {
-            player.dequipItem(itemName);
-        }
-    }
-
-    private void viewStats() {
-        QueueProvider.offer("\nWhat is your command? ex. View stats(vs), " +
-                "View Backpack(vb), View Equipment(ve) ");
-        String input = QueueProvider.take();
-        switch (input) {
-            case "vs":
-            case "viewstats":
-                player.getStats();
-                break;
-            case "ve":
-            case "viewequipped":
-                player.printEquipment();
-                break;
-            case "vb":
-            case "viewbackpack":
-                player.printStorage();
-                break;
-            case "back":
-            case "exit":
-                break;
-            default:
-                viewStats();
-                break;
-        }
-    }
 }
