@@ -472,7 +472,7 @@ public class Player extends Entity {
     	return getLocation().getLocationType();
     }
 
-    public void attack(String opponentName) throws DeathException {
+    public void startCombat(String opponentName) throws DeathException {
         Monster monsterOpponent = null;
         NPC npcOpponent = null;
         List<Monster> monsters = getLocation().getMonsters();
