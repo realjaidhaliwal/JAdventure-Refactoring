@@ -110,26 +110,9 @@ public class ConversationManager {
     }
 
     public void startConversation(NPC npc, Player player) throws DeathException {
-        List<Line> conversation = null;
-        //Workaround as <code>lines.get(npc)</code> is not working.
-        Iterator it = lines.entrySet().iterator();
-        while (it.hasNext()) {
-            @SuppressWarnings("unchecked")
-            Map.Entry<NPC, List<Line>> entry = (Map.Entry<NPC, List<Line>>) it.next();
-            if (entry.getKey().equals(npc)) {
-                conversation = entry.getValue();
-            }
-            it.remove();
-        }
+        List<Line> conversation = getLines(npc);
         if (conversation != null) {
             Line start = null;
-            for (Line l : conversation) {
-                if ("".equals(l.getPlayerPrompt()) && 
-                            ConversationManager.matchesConditions(npc, player, l)) {
-                    start = l;
-                    break;
-                }
-            }
             if (start != null) {
                 QueueProvider.offer(start.getText());
                 Line response = start.display(npc, player, conversation);
@@ -142,6 +125,31 @@ public class ConversationManager {
                }
             }
         }
+    }
+
+    public Line getLine(NPC npc, Player player, List<Line> conversation) {
+        for (Line l : conversation) {
+            if ("".equals(l.getPlayerPrompt()) &&
+                        ConversationManager.matchesConditions(npc, player, l)) {
+                return l;
+            }
+        }
+        return null;
+    }
+
+    public List<Line> getLines(NPC npc) {
+        List<Line> conversation = null;
+        //Workaround as <code>lines.get(npc)</code> is not working.
+        Iterator it = lines.entrySet().iterator();
+        while (it.hasNext()) {
+            @SuppressWarnings("unchecked")
+            Map.Entry<NPC, List<Line>> entry = (Map.Entry<NPC, List<Line>>) it.next();
+            if (entry.getKey().equals(npc)) {
+                conversation = entry.getValue();
+            }
+            it.remove();
+        }
+        return conversation;
     }
 
     private void triggerAction(Line line, NPC npc, Player player) throws DeathException {
