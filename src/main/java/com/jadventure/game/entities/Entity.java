@@ -242,7 +242,7 @@ public abstract class Entity {
         return result;
     }
 
-    private EquipmentLocation checkNewEquipmentLocation(EquipmentLocation place, Item item) {
+    private void unequipConflictingItems(EquipmentLocation place, Item item) {
         if (equipment.get(place) != null) {
             unequipItem(equipment.get(place));
         }
