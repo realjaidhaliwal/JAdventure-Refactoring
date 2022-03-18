@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import com.jadventure.game.monsters.Goblin;
+import com.jadventure.game.monsters.Monster;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -257,7 +259,51 @@ public class EntityTest {
         assertNull(equipment.get(EquipmentLocation.BOTH_ARMS));
     }
 
+    @Test
+    public void testEquipItem_ItemAlreadyInLocation() {
+        ItemRepository itemRepo = GameBeans.getItemRepository();
+        entity.equipItem(EquipmentLocation.HEAD, itemRepo.getItem("algt1"));
+        Item item = itemRepo.getItem("algt1");
+        Map<EquipmentLocation, Item> result = entity.getEquipment();
+        assertEquals(item, result.get(EquipmentLocation.HEAD));
+
+        entity.equipItem(EquipmentLocation.HEAD, itemRepo.getItem("albr1"));
+        result = entity.getEquipment();
+        item = itemRepo.getItem("albr1");
+        assertEquals(item, result.get(EquipmentLocation.HEAD));
+    }
+
+
+
     private void testInt(Object test) {
         assertTrue(test instanceof Integer);
+    }
+
+    @Test
+    public void testPlayerAttacksGoblin() {
+        Player player = Player.load("sewer_rat_test");
+        Monster gobo = new Goblin(player.getLevel());
+        // Guarantee damage
+        gobo.setArmour(0);
+
+        int initial_health = gobo.getHealth();
+        player.attack(gobo);
+        int final_health = gobo.getHealth();
+        assertTrue("Failure - goblin did not take damage, this should be guaranteed", initial_health>final_health);
+        assertTrue("Failure - health is negative", final_health>=0);
+    }
+
+    @Test
+    public void testGoblinAttacksPlayer() {
+        Player player = Player.load("sewer_rat_test");
+        Monster gobo = new Goblin(player.getLevel());
+        // Guarantee damage
+        player.setArmour(0);
+
+        int initial_health = player.getHealth();
+        gobo.attack(player);
+        int final_health = player.getHealth();
+        assertTrue("Failure - goblin did not take damage, this should be guaranteed", initial_health>final_health);
+        assertTrue("Failure - health is negative", final_health>=0);
     }
 }

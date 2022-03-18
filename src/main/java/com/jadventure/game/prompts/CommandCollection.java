@@ -167,7 +167,7 @@ public enum CommandCollection {
                             int posMonster = random.nextInt(monsters.size());
                             String monster = monsters.get(posMonster).monsterType;
                             QueueProvider.offer("A " + monster + " is attacking you!");
-                            player.attack(monster);
+                            player.startCombat(monster);
                         }
                     }
                 } else {
@@ -230,7 +230,7 @@ public enum CommandCollection {
 
     @Command(command="attack", aliases={"a"}, description="Attacks an entity", debug=false)
     public void command_a(String arg) throws DeathException {
-        player.attack(arg.trim());
+        player.startCombat(arg.trim());
     }
 
     @Command(command="lookaround", aliases={"la"}, description="Displays the description of the room you are in.", debug=false)

@@ -7,10 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,8 +21,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.jadventure.game.DeathException;
 import com.jadventure.game.GameBeans;
@@ -478,7 +472,7 @@ public class Player extends Entity {
     	return getLocation().getLocationType();
     }
 
-    public void attack(String opponentName) throws DeathException {
+    public void startCombat(String opponentName) throws DeathException {
         Monster monsterOpponent = null;
         NPC npcOpponent = null;
         List<Monster> monsters = getLocation().getMonsters();
@@ -507,5 +501,120 @@ public class Player extends Entity {
         List<Item> searchEquipment = searchEquipment(item.getName(), getEquipment());
         List<Item> searchStorage = searchItem(item.getName(), getStorage());
         return !(searchEquipment.size() == 0 && searchStorage.size() == 0);
+    }
+
+    public void trigger(String triggerType, String keyword) {
+        JsonParser parser = new JsonParser();
+        String fileName = "json/original_data/character_transitions.json";
+        try {
+            Reader reader = new FileReader(fileName);
+            JsonObject json = parser.parse(reader).getAsJsonObject();
+
+            String currentCharacter = getCurrentCharacterType();
+
+            JsonObject currentCharacterTransitions;
+            JsonObject events;
+            JsonObject characterEffects = new JsonObject();
+            boolean goAhead = false;
+            if (json.has(currentCharacter)) {
+                currentCharacterTransitions = json.get(currentCharacter).getAsJsonObject();
+                if (currentCharacterTransitions.has(triggerType)) {
+                    events = currentCharacterTransitions.get(triggerType).getAsJsonObject();
+                    if (events.has(keyword)) {
+                        characterEffects = events.get(keyword).getAsJsonObject();
+                        goAhead = true;
+                    } else {
+                        //QueueProvider.offer("Warning: The effects for the '" + triggerType + "' event and the '" + currentCharacter + "' character was not found");
+                    }
+                } else {
+                    //QueueProvider.offer("Warning: The event '" + triggerType + "' for the '" + currentCharacter + "' character was not found");
+                }
+            } else {
+                //QueueProvider.offer("Warning: The character '" + currentCharacter + "' was not found");
+            }
+
+            if (goAhead == true) {
+                for (Entry<String, JsonElement> entry : characterEffects.entrySet()) {
+                    String characterName = entry.getKey();
+                    int characterLevelEffect = entry.getValue().getAsInt();
+                    int characterLevel = getCharacterLevel(characterName);
+                    int newCharacterLevel = characterLevel + characterLevelEffect;
+                    setCharacterLevel(characterName, newCharacterLevel);
+                    checkForCharacterChange();
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void checkForCharacterChange() {
+        HashMap<String, Integer> characterLevels = getCharacterLevels();
+        String currentCharacter = getCurrentCharacterType();
+        int highestCharacterLevel = getCharacterLevel(currentCharacter);
+        String highestCharacter = currentCharacter;
+        Iterator it = characterLevels.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry pairs = (Entry)it.next();
+            int value = (int)pairs.getValue();
+            if (value > highestCharacterLevel) {
+                highestCharacterLevel = value;
+                highestCharacter = (String)pairs.getKey();
+            }
+        }
+        if (!highestCharacter.equals(currentCharacter)) {
+            setCurrentCharacterType(highestCharacter);
+            QueueProvider.offer("You're character type is now changed! You are now a " + highestCharacter + "!");
+        }
+        it = characterLevels.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry pairs = (Entry)it.next();
+            setCharacterLevel((String)pairs.getKey(), (int)pairs.getValue());
+        }
+    }
+
+    public void viewStats() {
+        QueueProvider.offer("\nWhat is your command? ex. View stats(vs), " +
+                "View Backpack(vb), View Equipment(ve) ");
+        String input = QueueProvider.take();
+        switch (input) {
+            case "vs":
+            case "viewstats":
+                getStats();
+                break;
+            case "ve":
+            case "viewequipped":
+                printEquipment();
+                break;
+            case "vb":
+            case "viewbackpack":
+                printStorage();
+                break;
+            case "back":
+            case "exit":
+                break;
+            default:
+                viewStats();
+                break;
+        }
+    }
+
+    public void promptEquip() {
+        printStorage();
+        QueueProvider.offer("What item do you want to use?");
+        String itemName = QueueProvider.take();
+        if (!itemName.equalsIgnoreCase("back")) {
+            equipItem(itemName);
+        }
+    }
+
+    public void promtUnequip() {
+        printEquipment();
+        QueueProvider.offer("What item do you want to unequip?");
+        String itemName = QueueProvider.take();
+        if (!itemName.equalsIgnoreCase("back")) {
+            dequipItem(itemName);
+        }
     }
 }
