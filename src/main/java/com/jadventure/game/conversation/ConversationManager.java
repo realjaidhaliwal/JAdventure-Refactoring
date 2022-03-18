@@ -112,7 +112,7 @@ public class ConversationManager {
     public void startConversation(NPC npc, Player player) throws DeathException {
         List<Line> conversation = getLines(npc);
         if (conversation != null) {
-            Line start = null;
+            Line start = getLine(npc, player, conversation);
             start = getLine(npc, player, conversation, start);
             if (start != null) {
                 QueueProvider.offer(start.getText());
