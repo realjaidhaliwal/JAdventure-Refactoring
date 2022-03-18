@@ -190,7 +190,7 @@ public abstract class Entity {
     public Map<String, String> equipItem(EquipmentLocation place, Item item) {
         double oldDamage = this.damage;
         int oldArmour = this.armour;
-        place = getEquipmentLocation(place, item);
+        place = checkNewEquipmentLocation(place, item);
         equipment.put(place, item);
         removeItemFromStorage(item);
         Map<String, String> result = new HashMap<String, String>();
@@ -239,7 +239,7 @@ public abstract class Entity {
         return result;
     }
 
-    private EquipmentLocation getEquipmentLocation(EquipmentLocation place, Item item) {
+    private EquipmentLocation checkNewEquipmentLocation(EquipmentLocation place, Item item) {
         if (place == null) {
             place = item.getPosition();
         }
