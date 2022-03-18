@@ -257,6 +257,22 @@ public class EntityTest {
         assertNull(equipment.get(EquipmentLocation.BOTH_ARMS));
     }
 
+    @Test
+    public void testEquipItem_ItemAlreadyInLocation() {
+        ItemRepository itemRepo = GameBeans.getItemRepository();
+        entity.equipItem(EquipmentLocation.HEAD, itemRepo.getItem("algt1"));
+        Item item = itemRepo.getItem("algt1");
+        Map<EquipmentLocation, Item> result = entity.getEquipment();
+        assertEquals(item, result.get(EquipmentLocation.HEAD));
+
+        entity.equipItem(EquipmentLocation.HEAD, itemRepo.getItem("albr1"));
+        result = entity.getEquipment();
+        item = itemRepo.getItem("albr1");
+        assertEquals(item, result.get(EquipmentLocation.HEAD));
+    }
+
+
+
     private void testInt(Object test) {
         assertTrue(test instanceof Integer);
     }
