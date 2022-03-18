@@ -127,15 +127,14 @@ public class ConversationManager {
         }
     }
 
-    public Line getLine(NPC npc, Player player, List<Line> conversation, Line start) {
+    public Line getLine(NPC npc, Player player, List<Line> conversation) {
         for (Line l : conversation) {
             if ("".equals(l.getPlayerPrompt()) &&
                         ConversationManager.matchesConditions(npc, player, l)) {
-                start = l;
-                break;
+                return l;
             }
         }
-        return start;
+        return null;
     }
 
     public List<Line> getLines(NPC npc) {
