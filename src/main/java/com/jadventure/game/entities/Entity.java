@@ -260,7 +260,6 @@ public abstract class Entity {
         if (bothArms != null && (place == EquipmentLocation.LEFT_ARM || place == EquipmentLocation.RIGHT_ARM)) { 
             unequipItem(bothArms);
         }
-        return place;
     }
 
     private void unequipTwoPlaces(EquipmentLocation leftLocation, EquipmentLocation rightLocation) {
