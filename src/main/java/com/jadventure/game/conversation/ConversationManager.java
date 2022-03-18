@@ -113,7 +113,6 @@ public class ConversationManager {
         List<Line> conversation = getLines(npc);
         if (conversation != null) {
             Line start = getLine(npc, player, conversation);
-            start = getLine(npc, player, conversation, start);
             if (start != null) {
                 QueueProvider.offer(start.getText());
                 Line response = start.display(npc, player, conversation);
