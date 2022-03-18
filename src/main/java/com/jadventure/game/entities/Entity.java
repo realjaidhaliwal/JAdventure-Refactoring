@@ -3,6 +3,7 @@ package com.jadventure.game.entities;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import com.jadventure.game.GameBeans;
 import com.jadventure.game.QueueProvider;
@@ -347,4 +348,30 @@ public abstract class Entity {
         storage.removeItem(new ItemStack(1, item)); 
     }
 
+    public void attack(Entity defender) {
+        if (getHealth() == 0) {
+            return;
+        }
+        Random rand = new Random();
+        double damage = getDamage();
+        double critCalc = rand.nextDouble();
+        if (critCalc < getCritChance()) {
+            damage += damage;
+            QueueProvider.offer("Crit hit! Damage has been doubled!");
+        }
+        int healthReduction = (int) ((((3 * getLevel() / 50 + 2) *
+                damage * damage / (defender.getArmour() + 1)/ 100) + 2) *
+                (rand.nextDouble() + 1));
+        defender.setHealth((defender.getHealth() - healthReduction));
+        if (defender.getHealth() < 0) {
+            defender.setHealth(0);
+        }
+        QueueProvider.offer(healthReduction + " damage dealt!");
+        if (this instanceof Player) {
+            QueueProvider.offer("The " + defender.getName() + "'s health is " +
+                    defender.getHealth());
+        } else {
+            QueueProvider.offer("Your health is " + defender.getHealth());
+        }
+    }
 }

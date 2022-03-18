@@ -1,7 +1,6 @@
 package com.jadventure.game.menus;
 
 import com.jadventure.game.DeathException;
-import com.jadventure.game.entities.Entity;
 import com.jadventure.game.entities.Player;
 import com.jadventure.game.entities.NPC;
 import com.jadventure.game.QueueProvider;
@@ -17,13 +16,11 @@ public class BattleMenu extends Menus {
 
     private NPC opponent;
     private Player player;
-    private Random random;
     private int armour;
     private double damage;
     private int escapeSuccessfulAttempts = 0;
 
     public BattleMenu(NPC opponent, Player player) throws DeathException {
-        this.random = new Random();
         this.opponent = opponent;
         this.player = player;
         this.armour = player.getArmour();
@@ -101,8 +98,8 @@ public class BattleMenu extends Menus {
         switch (m.getKey()) {
             case "attack": {
                    mutateStats(1, 0.5);
-                   attack(player, opponent);
-                   attack(opponent, player);
+                   player.attack(opponent);
+                   opponent.attack(player);
                    resetStats();
                    break;
             }
@@ -110,8 +107,8 @@ public class BattleMenu extends Menus {
                    mutateStats(0.5, 1);
                    QueueProvider.offer("\nYou get ready to defend against " +
                            "the " + opponent.getName() + ".");
-                   attack(player, opponent);
-                   attack(opponent, player);
+                   player.attack(opponent);
+                   opponent.attack(player);
                    resetStats();
                    break;
             }
@@ -167,32 +164,6 @@ public class BattleMenu extends Menus {
             QueueProvider.offer("You failed to escape the: " +
                     attacker.getName());
             return escapeAttempts-1;
-        }
-    }
-
-    private void attack(Entity attacker, Entity defender) {
-        if (attacker.getHealth() == 0) {
-            return;
-        }
-        double damage = attacker.getDamage();
-        double critCalc = random.nextDouble();
-        if (critCalc < attacker.getCritChance()) {
-            damage += damage;
-            QueueProvider.offer("Crit hit! Damage has been doubled!");
-        }
-        int healthReduction = (int) ((((3 * attacker.getLevel() / 50 + 2) *
-                damage * damage / (defender.getArmour() + 1)/ 100) + 2) *
-                (random.nextDouble() + 1));
-        defender.setHealth((defender.getHealth() - healthReduction));
-        if (defender.getHealth() < 0) {
-            defender.setHealth(0);
-        }
-        QueueProvider.offer(healthReduction + " damage dealt!");
-        if (attacker instanceof Player) {
-            QueueProvider.offer("The " + defender.getName() + "'s health is " +
-                    defender.getHealth());
-        } else {
-            QueueProvider.offer("Your health is " + defender.getHealth());
         }
     }
 
