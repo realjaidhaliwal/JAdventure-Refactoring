@@ -1,11 +1,9 @@
 package com.jadventure.game.menus;
 
 import com.jadventure.game.DeathException;
-import com.jadventure.game.entities.Entity;
 import com.jadventure.game.entities.Player;
 import com.jadventure.game.entities.NPC;
 import com.jadventure.game.QueueProvider;
-import com.jadventure.game.CharacterChange;
 import com.jadventure.game.items.ItemStack;
 import com.jadventure.game.items.Item;
 import com.jadventure.game.GameBeans;
@@ -18,13 +16,11 @@ public class BattleMenu extends Menus {
 
     private NPC opponent;
     private Player player;
-    private Random random;
     private int armour;
     private double damage;
     private int escapeSuccessfulAttempts = 0;
 
     public BattleMenu(NPC opponent, Player player) throws DeathException {
-        this.random = new Random();
         this.opponent = opponent;
         this.player = player;
         this.armour = player.getArmour();
@@ -81,8 +77,7 @@ public class BattleMenu extends Menus {
             if (oldLevel < newLevel) {
                 QueueProvider.offer("You've are now level " + newLevel + "!");
             }
-            CharacterChange cc = new CharacterChange();
-            cc.trigger(this.player, "kill", opponent.getName());
+            this.player.trigger("kill", opponent.getName());
         }
     }
 
@@ -103,8 +98,8 @@ public class BattleMenu extends Menus {
         switch (m.getKey()) {
             case "attack": {
                    mutateStats(1, 0.5);
-                   attack(player, opponent);
-                   attack(opponent, player);
+                   player.attack(opponent);
+                   opponent.attack(player);
                    resetStats();
                    break;
             }
@@ -112,8 +107,8 @@ public class BattleMenu extends Menus {
                    mutateStats(0.5, 1);
                    QueueProvider.offer("\nYou get ready to defend against " +
                            "the " + opponent.getName() + ".");
-                   attack(player, opponent);
-                   attack(opponent, player);
+                   player.attack(opponent);
+                   opponent.attack(player);
                    resetStats();
                    break;
             }
@@ -123,15 +118,15 @@ public class BattleMenu extends Menus {
                    break;
             }
             case "equip": {
-                   equip();
+                   player.promptEquip();
                    break;
             }
             case "unequip": {
-                  unequip();
+                  player.promtUnequip();
                   break;
             }
             case "view": {
-                  viewStats();
+                  player.viewStats();
                   break;
             }
             default: {
@@ -172,32 +167,6 @@ public class BattleMenu extends Menus {
         }
     }
 
-    private void attack(Entity attacker, Entity defender) {
-        if (attacker.getHealth() == 0) {
-            return;
-        }
-        double damage = attacker.getDamage();
-        double critCalc = random.nextDouble();
-        if (critCalc < attacker.getCritChance()) {
-            damage += damage;
-            QueueProvider.offer("Crit hit! Damage has been doubled!");
-        }
-        int healthReduction = (int) ((((3 * attacker.getLevel() / 50 + 2) *
-                damage * damage / (defender.getArmour() + 1)/ 100) + 2) *
-                (random.nextDouble() + 1));
-        defender.setHealth((defender.getHealth() - healthReduction));
-        if (defender.getHealth() < 0) {
-            defender.setHealth(0);
-        }
-        QueueProvider.offer(healthReduction + " damage dealt!");
-        if (attacker instanceof Player) {
-            QueueProvider.offer("The " + defender.getName() + "'s health is " +
-                    defender.getHealth());
-        } else {
-            QueueProvider.offer("Your health is " + defender.getHealth());
-        }
-    }
-
     private void mutateStats(double damageMult, double armourMult) {
         armour = player.getArmour();
         damage = player.getDamage();
@@ -210,47 +179,4 @@ public class BattleMenu extends Menus {
         player.setDamage(damage);
     }
 
-    private void equip() {
-        player.printStorage();
-        QueueProvider.offer("What item do you want to use?");
-        String itemName = QueueProvider.take();
-        if (!itemName.equalsIgnoreCase("back")) {
-            player.equipItem(itemName);
-        }
-    }
-
-    private void unequip() {
-        player.printEquipment();
-        QueueProvider.offer("What item do you want to unequip?");
-        String itemName = QueueProvider.take();
-        if (!itemName.equalsIgnoreCase("back")) {
-            player.dequipItem(itemName);
-        }
-    }
-
-    private void viewStats() {
-        QueueProvider.offer("\nWhat is your command? ex. View stats(vs), " +
-                "View Backpack(vb), View Equipment(ve) ");
-        String input = QueueProvider.take();
-        switch (input) {
-            case "vs":
-            case "viewstats":
-                player.getStats();
-                break;
-            case "ve":
-            case "viewequipped":
-                player.printEquipment();
-                break;
-            case "vb":
-            case "viewbackpack":
-                player.printStorage();
-                break;
-            case "back":
-            case "exit":
-                break;
-            default:
-                viewStats();
-                break;
-        }
-    }
 }

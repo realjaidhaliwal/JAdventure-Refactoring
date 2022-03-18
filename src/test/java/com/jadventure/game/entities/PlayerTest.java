@@ -29,4 +29,12 @@ public class PlayerTest {
         String actual = player.getName();
         assertEquals("Failure - old player not properly loaded", expected, actual);
     }
+
+    @Test
+    public void playerTypeTest() {
+        Player player = Player.load("sewer_rat_test");
+        assertEquals("Failure - test player not properly loaded", "Sewer Rat", player.getCurrentCharacterType());
+        player.trigger("kill", "Brotherhood Member");
+        assertEquals("Failure - test player type did not change", "Syndicate Member", player.getCurrentCharacterType());
+    }
 }

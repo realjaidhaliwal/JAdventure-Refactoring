@@ -148,7 +148,7 @@ public class ConversationManager {
         switch (line.getAction()) {
             case ATTACK:
                 QueueProvider.offer("\n" + npc.getName() + " is now attacking you!\n");
-                player.attack(npc.getName());
+                player.startCombat(npc.getName());
                 break;
             case TRADE:
                 Trading t = new Trading(npc, player);
