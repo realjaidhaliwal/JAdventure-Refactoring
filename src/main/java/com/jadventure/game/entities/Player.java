@@ -555,14 +555,7 @@ public class Player extends Entity {
         int highestCharacterLevel = getCharacterLevel(currentCharacter);
         String highestCharacter = currentCharacter;
         Iterator it = characterLevels.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry pairs = (Entry)it.next();
-            int value = (int)pairs.getValue();
-            if (value > highestCharacterLevel) {
-                highestCharacterLevel = value;
-                highestCharacter = (String)pairs.getKey();
-            }
-        }
+        highestCharacter = getString(highestCharacterLevel, highestCharacter, it);
         if (!highestCharacter.equals(currentCharacter)) {
             setCurrentCharacterType(highestCharacter);
             QueueProvider.offer("You're character type is now changed! You are now a " + highestCharacter + "!");
@@ -572,6 +565,18 @@ public class Player extends Entity {
             Entry pairs = (Entry)it.next();
             setCharacterLevel((String)pairs.getKey(), (int)pairs.getValue());
         }
+    }
+
+    private String getString(int highestCharacterLevel, String highestCharacter, Iterator it) {
+        while (it.hasNext()) {
+            Entry pairs = (Entry)it.next();
+            int value = (int)pairs.getValue();
+            if (value > highestCharacterLevel) {
+                highestCharacterLevel = value;
+                highestCharacter = (String)pairs.getKey();
+            }
+        }
+        return highestCharacter;
     }
 
     public void viewStats() {
