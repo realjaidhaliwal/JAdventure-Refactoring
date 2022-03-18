@@ -134,7 +134,7 @@ public class ConversationManager {
                 return l;
             }
         }
-        return null;
+        return start;
     }
 
     public List<Line> getLines(NPC npc) {
