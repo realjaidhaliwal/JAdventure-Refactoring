@@ -112,7 +112,7 @@ public class ConversationManager {
     public void startConversation(NPC npc, Player player) throws DeathException {
         List<Line> conversation = getLines(npc);
         if (conversation != null) {
-            Line start = getLine(npc, player, conversation);
+            Line start = null;
             if (start != null) {
                 QueueProvider.offer(start.getText());
                 Line response = start.display(npc, player, conversation);
@@ -134,7 +134,7 @@ public class ConversationManager {
                 return l;
             }
         }
-        return start;
+        return null;
     }
 
     public List<Line> getLines(NPC npc) {
